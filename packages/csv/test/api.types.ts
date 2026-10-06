@@ -1,5 +1,12 @@
 import "should";
-import { generate, parse, parser, stringify, transform } from "../lib/index.js";
+import {
+  generate,
+  parse,
+  parser,
+  stringifier,
+  stringify,
+  transform,
+} from "../lib/index.js";
 
 describe("API Types", function () {
   describe("Initialisation", function () {
@@ -48,6 +55,22 @@ describe("API Types", function () {
         (record) => record,
         (err, records) => err || records,
       );
+    });
+  });
+
+  describe("Namespaces", function () {
+    it("parser.CsvError", function () {
+      const err = new parser.CsvError("CSV_INVALID_ARGUMENT", "message");
+      const code: parser.CsvErrorCode = err.code;
+      (err instanceof parser.CsvError).should.be.true();
+      code.should.eql("CSV_INVALID_ARGUMENT");
+    });
+
+    it("stringifier.CsvError", function () {
+      const err = new stringifier.CsvError("CSV_INVALID_ARGUMENT", "message");
+      const code: stringifier.CsvErrorCode = err.code;
+      (err instanceof stringifier.CsvError).should.be.true();
+      code.should.eql("CSV_INVALID_ARGUMENT");
     });
   });
 });

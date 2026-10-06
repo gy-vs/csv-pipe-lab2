@@ -1,6 +1,7 @@
 import "should";
 import {
   stringify,
+  CsvError,
   RecordDelimiter,
   Cast,
   PlainObject,
@@ -9,6 +10,7 @@ import {
   CastingContext,
   Options,
 } from "../lib/sync.js";
+import type { CsvErrorCode } from "../lib/sync.js";
 
 describe("API Types", function () {
   it("stringify return string", function () {
@@ -52,5 +54,17 @@ describe("API Types", function () {
       },
     };
     options;
+  });
+
+  it("CsvError", function () {
+    let err;
+    try {
+      stringify([["a"]], { delimiter: 123 as unknown as string });
+    } catch (e) {
+      err = e;
+    }
+    (err instanceof CsvError).should.be.true();
+    const code: CsvErrorCode = (err as CsvError).code;
+    code.should.eql("CSV_OPTION_DELIMITER_INVALID_TYPE");
   });
 });

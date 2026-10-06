@@ -1,3 +1,4 @@
+import { CsvError } from "./api/CsvError.js";
 import { stringifier } from "./api/index.js";
 import { normalize_options } from "./api/normalize_options.js";
 
@@ -31,4 +32,4 @@ const stringify = function (records, opts = {}) {
   return data.join("");
 };
 
-export { stringify };
+export { stringify, CsvError };

@@ -206,6 +206,27 @@ export interface Options extends stream.TransformOptions {
   escape_formulas?: boolean;
 }
 
+export type CsvErrorCode =
+  | "CSV_INVALID_ARGUMENT"
+  | "CSV_INVALID_OPTION_HEADER"
+  | "CSV_INVALID_OPTION_HEADER_AS_COMMENT"
+  | "CSV_OPTION_BOOLEAN_INVALID_TYPE"
+  | "CSV_OPTION_DELIMITER_INVALID_TYPE"
+  | "CSV_OPTION_ESCAPE_FORMULAS_INVALID_TYPE"
+  | "CSV_OPTION_QUOTED_MATCH"
+  | "CSV_OPTION_QUOTE_INVALID_TYPE";
+
+export class CsvError extends Error {
+  readonly code: CsvErrorCode;
+  [key: string]: unknown;
+
+  constructor(
+    code: CsvErrorCode,
+    message: string | string[],
+    ...contexts: unknown[]
+  );
+}
+
 export class Stringifier extends stream.Transform {
   constructor(options: Options);
   readonly options: OptionsNormalized;

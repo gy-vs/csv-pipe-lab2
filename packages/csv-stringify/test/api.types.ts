@@ -2,6 +2,8 @@ import "should";
 import {
   stringify,
   CastingContext,
+  CsvError,
+  CsvErrorCode,
   Options,
   Stringifier,
 } from "../lib/index.js";
@@ -170,6 +172,28 @@ describe("API Types", function () {
         const records: number = context.records;
         return [column, header, index, records];
       };
+    });
+  });
+
+  describe("CsvError", function () {
+    it("is exposed and typed", function () {
+      const err = new CsvError("CSV_OPTION_DELIMITER_INVALID_TYPE", "message");
+      const code: CsvErrorCode = err.code;
+      (err instanceof CsvError).should.be.true();
+      code.should.eql("CSV_OPTION_DELIMITER_INVALID_TYPE");
+    });
+
+    it("types caught errors", function () {
+      try {
+        stringify([], { delimiter: 123 as unknown as string });
+      } catch (err) {
+        if (err instanceof CsvError) {
+          const code: CsvErrorCode = err.code;
+          code.should.eql("CSV_OPTION_DELIMITER_INVALID_TYPE");
+          const message: string = err.message;
+          message.should.be.a.String();
+        }
+      }
     });
   });
 });

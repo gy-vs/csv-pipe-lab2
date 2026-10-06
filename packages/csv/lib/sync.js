@@ -6,3 +6,8 @@ import { stringify } from "csv-stringify/sync";
 import { transform } from "stream-transform/sync";
 
 export { generate, parse, stringify, transform };
+
+export * as generator from "csv-generate/sync";
+export * as parser from "csv-parse/sync";
+export * as transformer from "stream-transform/sync";
+export * as stringifier from "csv-stringify/sync";

@@ -5409,6 +5409,11 @@ const generate = function (options) {
   }
 };
 
+var sync$3 = /*#__PURE__*/Object.freeze({
+            __proto__: null,
+            generate: generate
+});
+
 let CsvError$1 = class CsvError extends Error {
   constructor(code, message, options, ...contexts) {
     if (Array.isArray(message)) message = message.join(" ").trim();
@@ -7414,6 +7419,34 @@ const parse = function (data, opts = {}) {
   return records;
 };
 
+var sync$2 = /*#__PURE__*/Object.freeze({
+            __proto__: null,
+            CsvError: CsvError$1,
+            normalize_options: normalize_options$1,
+            parse: parse
+});
+
+class CsvError extends Error {
+  constructor(code, message, ...contexts) {
+    if (Array.isArray(message)) message = message.join(" ");
+    super(message);
+    if (Error.captureStackTrace !== undefined) {
+      Error.captureStackTrace(this, CsvError);
+    }
+    this.code = code;
+    for (const context of contexts) {
+      for (const key in context) {
+        const value = context[key];
+        this[key] = isBuffer$1(value)
+          ? value.toString()
+          : value == null
+            ? value
+            : JSON.parse(JSON.stringify(value));
+      }
+    }
+  }
+}
+
 // Lodash implementation of `get`
 
 const charCodeOfDot = ".".charCodeAt(0);
@@ -7565,27 +7598,6 @@ const normalize_columns = function (columns) {
   }
   return [undefined, columns];
 };
-
-class CsvError extends Error {
-  constructor(code, message, ...contexts) {
-    if (Array.isArray(message)) message = message.join(" ");
-    super(message);
-    if (Error.captureStackTrace !== undefined) {
-      Error.captureStackTrace(this, CsvError);
-    }
-    this.code = code;
-    for (const context of contexts) {
-      for (const key in context) {
-        const value = context[key];
-        this[key] = isBuffer$1(value)
-          ? value.toString()
-          : value == null
-            ? value
-            : JSON.parse(JSON.stringify(value));
-      }
-    }
-  }
-}
 
 const underscore = function (str) {
   return str.replace(/([A-Z])/g, function (_, match) {
@@ -8214,6 +8226,12 @@ const stringify = function (records, opts = {}) {
   return data.join("");
 };
 
+var sync$1 = /*#__PURE__*/Object.freeze({
+            __proto__: null,
+            CsvError: CsvError,
+            stringify: stringify
+});
+
 /*
 Stream Transform
 
@@ -8372,4 +8390,9 @@ const transform = function () {
   return chunks;
 };
 
-export { generate, parse, stringify, transform };
+var sync = /*#__PURE__*/Object.freeze({
+            __proto__: null,
+            transform: transform
+});
+
+export { generate, sync$3 as generator, parse, sync$2 as parser, sync$1 as stringifier, stringify, transform, sync as transformer };
