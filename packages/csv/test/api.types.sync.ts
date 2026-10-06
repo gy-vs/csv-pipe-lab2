@@ -47,4 +47,40 @@ describe("API Types", function () {
       return options;
     });
   });
+
+  describe("namespaces", function () {
+    it("parser.CsvError", function () {
+      try {
+        parse("a,b", {
+          // @ts-expect-error delimiter must be a string or a buffer
+          delimiter: 1,
+        });
+      } catch (err) {
+        if (err instanceof parser.CsvError) {
+          const code: parser.CsvErrorCode = err.code;
+          code.should.eql("CSV_INVALID_OPTION_DELIMITER");
+          return;
+        }
+        throw Error("Invalid assessment", { cause: err });
+      }
+      throw Error("Invalid assessment");
+    });
+
+    it("stringifier.CsvError", function () {
+      try {
+        stringify([], {
+          // @ts-expect-error delimiter must be a string or a buffer
+          delimiter: 1,
+        });
+      } catch (err) {
+        if (err instanceof stringifier.CsvError) {
+          const code: stringifier.CsvErrorCode = err.code;
+          code.should.eql("CSV_OPTION_DELIMITER_INVALID_TYPE");
+          return;
+        }
+        throw Error("Invalid assessment", { cause: err });
+      }
+      throw Error("Invalid assessment");
+    });
+  });
 });

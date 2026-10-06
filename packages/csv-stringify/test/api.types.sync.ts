@@ -1,6 +1,8 @@
 import "should";
 import {
   stringify,
+  CsvError,
+  CsvErrorCode,
   RecordDelimiter,
   Cast,
   PlainObject,
@@ -52,5 +54,22 @@ describe("API Types", function () {
       },
     };
     options;
+  });
+
+  it("CsvError", function () {
+    try {
+      stringify([], {
+        // @ts-expect-error delimiter must be a string or a buffer
+        delimiter: 1,
+      });
+    } catch (err) {
+      if (err instanceof CsvError) {
+        const code: CsvErrorCode = err.code;
+        code.should.eql("CSV_OPTION_DELIMITER_INVALID_TYPE");
+        return;
+      }
+      throw Error("Invalid assessment", { cause: err });
+    }
+    throw Error("Invalid assessment");
   });
 });

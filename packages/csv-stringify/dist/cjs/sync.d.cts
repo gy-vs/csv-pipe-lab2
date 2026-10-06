@@ -13,4 +13,6 @@ export {
   CastingContext,
   Options,
   OptionsNormalized,
+  CsvErrorCode,
+  CsvError,
 } from "./index.cjs";

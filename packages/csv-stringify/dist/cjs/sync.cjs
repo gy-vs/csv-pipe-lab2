@@ -1,5 +1,26 @@
 'use strict';
 
+class CsvError extends Error {
+  constructor(code, message, ...contexts) {
+    if (Array.isArray(message)) message = message.join(" ");
+    super(message);
+    if (Error.captureStackTrace !== undefined) {
+      Error.captureStackTrace(this, CsvError);
+    }
+    this.code = code;
+    for (const context of contexts) {
+      for (const key in context) {
+        const value = context[key];
+        this[key] = Buffer.isBuffer(value)
+          ? value.toString()
+          : value == null
+            ? value
+            : JSON.parse(JSON.stringify(value));
+      }
+    }
+  }
+}
+
 // Lodash implementation of `get`
 
 const charCodeOfDot = ".".charCodeAt(0);
@@ -151,27 +172,6 @@ const normalize_columns = function (columns) {
   }
   return [undefined, columns];
 };
-
-class CsvError extends Error {
-  constructor(code, message, ...contexts) {
-    if (Array.isArray(message)) message = message.join(" ");
-    super(message);
-    if (Error.captureStackTrace !== undefined) {
-      Error.captureStackTrace(this, CsvError);
-    }
-    this.code = code;
-    for (const context of contexts) {
-      for (const key in context) {
-        const value = context[key];
-        this[key] = Buffer.isBuffer(value)
-          ? value.toString()
-          : value == null
-            ? value
-            : JSON.parse(JSON.stringify(value));
-      }
-    }
-  }
-}
 
 const underscore = function (str) {
   return str.replace(/([A-Z])/g, function (_, match) {
@@ -800,4 +800,5 @@ const stringify = function (records, opts = {}) {
   return data.join("");
 };
 
+exports.CsvError = CsvError;
 exports.stringify = stringify;

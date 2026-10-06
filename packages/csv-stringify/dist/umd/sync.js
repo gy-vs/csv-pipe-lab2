@@ -1976,6 +1976,27 @@
               return typeof obj.readFloatLE === 'function' && typeof obj.slice === 'function' && isFastBuffer(obj.slice(0, 0))
             }
 
+            class CsvError extends Error {
+              constructor(code, message, ...contexts) {
+                if (Array.isArray(message)) message = message.join(" ");
+                super(message);
+                if (Error.captureStackTrace !== undefined) {
+                  Error.captureStackTrace(this, CsvError);
+                }
+                this.code = code;
+                for (const context of contexts) {
+                  for (const key in context) {
+                    const value = context[key];
+                    this[key] = isBuffer(value)
+                      ? value.toString()
+                      : value == null
+                        ? value
+                        : JSON.parse(JSON.stringify(value));
+                  }
+                }
+              }
+            }
+
             // Lodash implementation of `get`
 
             const charCodeOfDot = ".".charCodeAt(0);
@@ -2127,27 +2148,6 @@
               }
               return [undefined, columns];
             };
-
-            class CsvError extends Error {
-              constructor(code, message, ...contexts) {
-                if (Array.isArray(message)) message = message.join(" ");
-                super(message);
-                if (Error.captureStackTrace !== undefined) {
-                  Error.captureStackTrace(this, CsvError);
-                }
-                this.code = code;
-                for (const context of contexts) {
-                  for (const key in context) {
-                    const value = context[key];
-                    this[key] = isBuffer(value)
-                      ? value.toString()
-                      : value == null
-                        ? value
-                        : JSON.parse(JSON.stringify(value));
-                  }
-                }
-              }
-            }
 
             const underscore = function (str) {
               return str.replace(/([A-Z])/g, function (_, match) {
@@ -2776,6 +2776,7 @@
               return data.join("");
             };
 
+            exports.CsvError = CsvError;
             exports.stringify = stringify;
 
 }));

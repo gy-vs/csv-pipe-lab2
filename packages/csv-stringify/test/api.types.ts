@@ -2,6 +2,8 @@ import "should";
 import {
   stringify,
   CastingContext,
+  CsvError,
+  CsvErrorCode,
   Options,
   Stringifier,
 } from "../lib/index.js";
@@ -170,6 +172,60 @@ describe("API Types", function () {
         const records: number = context.records;
         return [column, header, index, records];
       };
+    });
+  });
+
+  describe("CsvError", function () {
+    it("Minimum", function () {
+      const error = new CsvError("CSV_INVALID_ARGUMENT", "MESSAGE");
+      error.code.should.eql("CSV_INVALID_ARGUMENT");
+      error.message.should.eql("MESSAGE");
+    });
+
+    it("Multiple messages", function () {
+      const error = new CsvError("CSV_INVALID_ARGUMENT", [
+        "MESSAGE1",
+        "MESSAGE2",
+      ]);
+      error.message.should.eql("MESSAGE1 MESSAGE2");
+    });
+
+    it("Supports contexts", function () {
+      const error = new CsvError(
+        "CSV_OPTION_DELIMITER_INVALID_TYPE",
+        "MESSAGE",
+        { value: 1 },
+      );
+      error.should.have.key("value").and.eql(1);
+    });
+
+    it("CsvErrorCode", function () {
+      const error = new CsvError("CSV_OPTION_QUOTED_MATCH", "MESSAGE");
+      const code: CsvErrorCode = error.code;
+      code.should.eql("CSV_OPTION_QUOTED_MATCH");
+    });
+
+    it("code is typed, not any", function () {
+      const error = new CsvError("CSV_INVALID_ARGUMENT", "MESSAGE");
+      // @ts-expect-error code is a CsvErrorCode union, not any string
+      const code: "CSV_WHATEVER" = error.code;
+      return code;
+    });
+
+    it("Proper type is thrown when an error is encountered", function () {
+      try {
+        stringify({
+          // @ts-expect-error delimiter must be a string or a buffer
+          delimiter: 1,
+        });
+      } catch (err) {
+        if (err instanceof CsvError) {
+          err.code.should.eql("CSV_OPTION_DELIMITER_INVALID_TYPE");
+          return;
+        }
+        throw Error("Invalid assessment", { cause: err });
+      }
+      throw Error("Invalid assessment");
     });
   });
 });
